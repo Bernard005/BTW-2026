@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTW Bonnetjes</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0d0d;--surface:#161616;--surface2:#1e1e1e;--border:#2a2a2a;--border2:#333;--text:#f0ede8;--muted:#666;--muted2:#888;--green:#2dce7a;--amber:#f5a623;--red:#ff4d4d;--tag-21:#ff6b35;--tag-9:#2dce7a;--tag-0:#666}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh}
+header{padding:32px 40px 28px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.logo-label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.logo h1{font-family:'Instrument Serif',serif;font-size:clamp(26px,3.5vw,42px);font-style:italic;line-height:1}
+.logo h1 em{font-style:normal;color:var(--green)}
+.header-meta{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+.meta-field{display:flex;flex-direction:column;gap:4px}
+.meta-field label{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+.meta-field input,.meta-field select{background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:7px 11px;font-family:'Syne',sans-serif;font-size:12px;color:var(--text);outline:none;transition:border-color .2s}
+.meta-field input:focus,.meta-field select:focus{border-color:var(--green)}
+main{display:grid;grid-template-columns:1fr 320px;min-height:calc(100vh - 120px)}
+.list-panel{padding:28px 36px;border-right:1px solid var(--border);overflow-y:auto}
+.panel-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.panel-top h2{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2)}
+.import-bar{background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:18px 20px;margin-bottom:20px}
+.import-bar-title{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);margin-bottom:10px}
+.import-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn-import{background:var(--green);color:#000;border:none;border-radius:5px;padding:9px 16px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.06em;cursor:pointer;position:relative;transition:all .18s;white-space:nowrap}
+.btn-import:hover{background:#24b567}
+.btn-import input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.btn-manual{background:transparent;border:1px solid var(--border2);color:var(--muted2);border-radius:5px;padding:9px 16px;font-family:'Syne',sans-serif;font-size:11px;letter-spacing:.06em;cursor:pointer;transition:all .18s;white-space:nowrap}
+.btn-manual:hover{border-color:var(--text);color:var(--text)}
+.import-hint{font-size:10px;color:var(--muted);line-height:1.6;margin-top:10px}
+.filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.filter-btn{padding:5px 12px;border-radius:20px;font-size:11px;font-family:'Syne',sans-serif;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--muted2);transition:all .15s;white-space:nowrap}
+.filter-btn.active{background:var(--surface2);color:var(--text);border-color:#555}
+.filter-search{flex:1;min-width:140px;background:var(--surface2);border:1px solid var(--border2);border-radius:20px;padding:5px 14px;font-family:'Syne',sans-serif;font-size:11px;color:var(--text);outline:none}
+.filter-search:focus{border-color:var(--green)}
+.bon-table{width:100%;border-collapse:collapse}
+.bon-table thead tr{border-bottom:1px solid var(--border2)}
+.bon-table th{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:0 10px 10px;text-align:left;font-weight:600;white-space:nowrap}
+.bon-table tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
+.bon-table tbody tr:hover{background:var(--surface)}
+.bon-table tbody tr.excluded{opacity:.35}
+.bon-table td{padding:10px;font-size:12px;vertical-align:middle}
+.td-date{color:var(--muted2);font-size:11px;white-space:nowrap}
+.td-omsch{max-width:200px}
+.td-omsch input{background:transparent;border:none;border-bottom:1px solid transparent;width:100%;font-family:'Syne',sans-serif;font-size:12px;color:var(--text);outline:none;padding:2px 0;transition:border-color .15s}
+.td-omsch input:focus{border-bottom-color:var(--green)}
+.td-bedrag{text-align:right;white-space:nowrap}
+.td-btw{text-align:right;color:var(--green);font-weight:600;white-space:nowrap}
+.td-btw.zero{color:var(--muted);font-weight:400}
+.rate-sel{background:transparent;border:1px solid var(--border2);border-radius:3px;padding:2px 5px;font-family:'Syne',sans-serif;font-size:10px;color:var(--muted2);cursor:pointer}
+.rate-sel.r21{border-color:rgba(255,107,53,.4);color:var(--tag-21)}
+.rate-sel.r9{border-color:rgba(45,206,122,.4);color:var(--tag-9)}
+.rate-sel.r0{border-color:rgba(102,102,102,.4);color:var(--muted)}
+.btn-excl{background:none;border:none;color:var(--muted);cursor:pointer;padding:3px 5px;font-size:13px;transition:color .15s;line-height:1}
+.btn-excl:hover{color:var(--red)}
+.btn-excl.excluded{color:var(--red)}
+.empty-state{text-align:center;padding:50px 20px;color:var(--muted)}
+.empty-state .big{font-size:40px;margin-bottom:10px}
+.empty-state p{font-size:12px;line-height:1.8}
+.summary-panel{padding:28px 24px;position:sticky;top:0;height:calc(100vh - 120px);overflow-y:auto;display:flex;flex-direction:column;gap:16px}
+.sum-title{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+.sum-total{background:var(--green);color:#000;border-radius:8px;padding:20px 18px}
+.st-label{font-size:9px;letter-spacing:.15em;text-transform:uppercase;opacity:.65;margin-bottom:6px}
+.st-amount{font-family:'Instrument Serif',serif;font-size:32px;font-style:italic;line-height:1}
+.st-sub{font-size:10px;opacity:.55;margin-top:7px;line-height:1.5}
+.sum-card{background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:16px 18px}
+.sum-card h3{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.sum-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px}
+.sum-row:last-child{border-bottom:none}
+.sr-label{color:var(--muted2)}
+.sr-val{font-weight:600}
+.sr-val.green{color:var(--green)}
+.sr-val.amber{color:var(--amber)}
+.sr-val.muted{color:var(--muted);font-weight:400}
+.btn-action{width:100%;padding:11px;border-radius:6px;font-family:'Syne',sans-serif;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;cursor:pointer;border:none;transition:all .18s}
+.btn-belasting{background:var(--amber);color:#000}
+.btn-belasting:hover{background:#e0941a}
+.btn-export{background:var(--surface2);color:var(--muted2);border:1px solid var(--border2);margin-top:6px}
+.btn-export:hover{border-color:var(--text);color:var(--text)}
+.excl-note{font-size:10px;color:var(--muted);text-align:center;margin-top:4px;line-height:1.5}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--surface);border:1px solid var(--green);color:var(--green);padding:10px 22px;border-radius:30px;font-size:11px;letter-spacing:.07em;transition:transform .3s ease;z-index:999;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+@media(max-width:768px){main{grid-template-columns:1fr}.summary-panel{position:static;height:auto}.list-panel{padding:16px}header{padding:20px 16px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <span class="logo-label">KNAB Import · BTW Voorbelasting</span>
+    <h1>BTW <em>Bonnetjes</em></h1>
+  </div>
+  <div class="header-meta">
+    <div class="meta-field"><label>BV naam</label><input type="text" id="bvNaam" placeholder="Uw Bedrijf BV" style="width:170px"></div>
+    <div class="meta-field"><label>Periode</label>
+      <select id="periode" style="width:130px">
+        <option>Q1 2025</option><option>Q2 2025</option><option>Q3 2025</option><option selected>Q4 2025</option><option>Q1 2026</option><option>Q2 2026</option>
+      </select>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="list-panel">
+    <div class="import-bar">
+      <div class="import-bar-title">📥 KNAB Bankafschrift importeren</div>
+      <div class="import-actions">
+        <button class="btn-import">KNAB CSV importeren<input type="file" accept=".csv,.txt" onchange="importKNAB(event)"></button>
+        <button class="btn-manual" onclick="voegToe()">+ Handmatig toevoegen</button>
+      </div>
+      <div class="import-hint">Exporteer je KNAB rekeningafschrift als CSV en importeer het direct hier.<br>Betalingen aan Belastingdienst, verzekeringen en bankkosten worden automatisch uitgesloten (×).</div>
+    </div>
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="setFilter('alle',this)">Alle</button>
+      <button class="filter-btn" onclick="setFilter('21',this)">21%</button>
+      <button class="filter-btn" onclick="setFilter('9',this)">9%</button>
+      <button class="filter-btn" onclick="setFilter('0',this)">0%</button>
+      <button class="filter-btn" onclick="setFilter('excl',this)">Uitgesloten</button>
+      <input class="filter-search" type="text" placeholder="Zoeken..." oninput="zoek(this.value)">
+    </div>
+    <div class="panel-top"><h2 id="bon-count">0 regels</h2></div>
+    <div id="lijst-wrapper">
+      <div class="empty-state" id="empty-state"><div class="big">🏦</div><p>Importeer je KNAB bankafschrift (CSV)<br>of voeg regels handmatig toe.</p></div>
+      <table class="bon-table" id="bon-table" style="display:none">
+        <thead><tr><th>Datum</th><th>Tegenpartij</th><th>Betaalwijze</th><th style="text-align:right">Bedrag</th><th>BTW %</th><th style="text-align:right">BTW</th><th></th></tr></thead>
+        <tbody id="bon-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="summary-panel">
+    <div class="sum-title">Samenvatting</div>
+    <div class="sum-total"><div class="st-label">Totaal voorbelasting (5g)</div><div class="st-amount" id="st-amount">€ 0,00</div><div class="st-sub">Te verrekenen in BTW-aangifte</div></div>
+    <div class="sum-card"><h3>Per BTW-tarief</h3>
